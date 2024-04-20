@@ -33,7 +33,7 @@ dates={}
 end_date=dt.date(2024, 6, 15)
 
 # sleep time for each loop iteration through the available dates
-sleep_time = 5 # minutes
+sleep_time = 10 # minutes
 
 @client.event
 async def on_ready():
@@ -98,12 +98,14 @@ async def check():
             else:
                 print("Error:", response.status_code)
                 print(response.text)
+                break
 
         except requests.exceptions.RequestException as e:
             print("Error:", e)
-
-        if date == end_date:
             break
+
+        # if date == end_date:
+        #     break
 
 if __name__ == '__main__':
     """Main
