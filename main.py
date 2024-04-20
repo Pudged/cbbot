@@ -57,7 +57,7 @@ async def notify_discord(date, time):
         time (string): time on available day
     """
     guild = client.get_guild(GUILD)
-    # await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {date} at {time}")
+    await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {date} at {time}")
 
 
 async def check():
@@ -101,7 +101,7 @@ async def check():
         except requests.exceptions.RequestException as e:
             print("Error:", e)
 
-        if date == dt.date(2024, 5, 3):
+        if date == dt.date(2024, 6, 15):
             break
 
 if __name__ == '__main__':
