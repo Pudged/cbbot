@@ -45,7 +45,7 @@ Run the python
 
 ## Environment Variables
 
-To run this project, you will need to add the following environment variables to your .env file
+To run this project, you will need to add the following environment variables to your .env file if running the app locally. If running on Heroku, these will need to be added to the Config Vars for your application.
 
 `BOOKING_CODE`: Obtain from your unique email link \
 `PARTY_SIZE`: Size of party (1-8)\
