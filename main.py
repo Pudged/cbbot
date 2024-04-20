@@ -30,6 +30,7 @@ CHANNEL = int(os.getenv("CHANNEL"))
 # Dict to hold dates. Key will be the unique days, value will be a list of the times on said day
 # format: {'2024-04-26': ['8:15pm'], '2024-05-01': ['4:00pm', '4:15pm', '8:00pm', '8:15pm', '8:30pm'], '2024-05-02': ['3:00pm', '3:15pm', '3:30pm', '3:45pm', '4:00pm', '4:15pm', '4:30pm', '4:45pm', '8:15pm', '8:30pm'], '2024-05-03': ['3:00pm']}
 dates={}
+end_date=dt.date(2024, 6, 15)
 
 # sleep time for each loop iteration through the available dates
 sleep_time = 5 # minutes
@@ -101,7 +102,7 @@ async def check():
         except requests.exceptions.RequestException as e:
             print("Error:", e)
 
-        if date == dt.date(2024, 6, 15):
+        if date == end_date:
             break
 
 if __name__ == '__main__':
