@@ -30,7 +30,7 @@ CHANNEL = int(os.getenv("CHANNEL"))
 # Dict to hold dates. Key will be the unique days, value will be a list of the times on said day
 # format: {'2024-04-26': ['8:15pm'], '2024-05-01': ['4:00pm', '4:15pm', '8:00pm', '8:15pm', '8:30pm'], '2024-05-02': ['3:00pm', '3:15pm', '3:30pm', '3:45pm', '4:00pm', '4:15pm', '4:30pm', '4:45pm', '8:15pm', '8:30pm'], '2024-05-03': ['3:00pm']}
 dates={}
-end_date=dt.date(2024, 6, 15)
+# end_date=dt.date(2024, 6, 15)
 
 # sleep time for each loop iteration through the available dates
 sleep_time = 10 # minutes
@@ -50,15 +50,16 @@ async def slow_count():
         await check()
         print(f"Sleeping for {sleep_time} minutes")
 
-async def notify_discord(date, time):
+async def notify_discord(weekday, date, time):
     """Send notification to CHANNEL while pinging USER_ID
 
     Args:
+        weekday (string): weekday (Monday, Tuesday, etc.)
         date (string): isodate formatted available day
         time (string): time on available day
     """
     guild = client.get_guild(GUILD)
-    await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {date} at {time}")
+    await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
 
 
 async def check():
@@ -72,7 +73,7 @@ async def check():
 
     while True:
         date += dt.timedelta(days=1)
-        print(f"Checking availability for {date}")
+        print(f"Checking availability for {date.strftime('%A')} {date}")
         RES_DATE = date.isoformat()
         url = f"https://casatix-api.casabonitadenver.com/api/v2/search?booking_code={BOOKING_CODE}&service={SERVICE}&res_date={RES_DATE}&party_size={PARTY_SIZE}"
         # print(url)
@@ -92,7 +93,7 @@ async def check():
                         else:
                             dates[RES_DATE].append(f_time)
                             print(f"Added {f_time} to {RES_DATE}")
-                            await notify_discord(RES_DATE, f_time)
+                            await notify_discord(date.strftime('%A'), RES_DATE, f_time)
                         # print(dates)
 
             else:
