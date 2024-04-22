@@ -7,7 +7,7 @@ This application will check for availability of reservations at Casa Bonita. The
 
 ## Documentation
 
-[Getting Started with Discord.py](https://discordpy.readthedocs.io/en/stable/n)
+[Getting Started with Discord.py](https://discordpy.readthedocs.io/en/stable)
 
 [Deploying to Heroku](https://www.youtube.com/watch?v=TxYGJyuEXPk)
 
