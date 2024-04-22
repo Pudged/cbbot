@@ -19,12 +19,6 @@ Clone the project
   git clone git@github.com:Pudged/cbbot.git
 ```
 
-Go to the project directory
-
-```bash
-  cd <path-to-cloned-project>
-```
-
 Install dependencies
 
 ```bash
