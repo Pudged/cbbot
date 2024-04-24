@@ -34,6 +34,7 @@ dates={}
 
 # sleep time for each loop iteration through the available dates
 sleep_time = 10 # minutes
+rate_limit_sleep = 60 # seconds
 
 @client.event
 async def on_ready():
@@ -72,11 +73,12 @@ async def check():
     date = dt.date.today()
 
     while True:
-        date += dt.timedelta(days=1)
         print(f"Checking availability for {date.strftime('%A')} {date}")
         RES_DATE = date.isoformat()
         url = f"https://casatix-api.casabonitadenver.com/api/v2/search?booking_code={BOOKING_CODE}&service={SERVICE}&res_date={RES_DATE}&party_size={PARTY_SIZE}"
         # print(url)
+
+        flag = False
 
         try:
             response = requests.get(url, headers=headers)
@@ -99,11 +101,18 @@ async def check():
             else:
                 print("Error:", response.status_code)
                 print(response.text)
-                break
+                if response.status_code == 429:
+                    print("Sleeping for a minute while rate limited")
+                    time.sleep(rate_limit_sleep)
+                    flag = True
+                elif response.status_code == 400:
+                    break
 
         except requests.exceptions.RequestException as e:
             print("Error:", e)
-            break
+
+        if not flag:
+            date += dt.timedelta(days=1)
 
         # if date == end_date:
         #     break
