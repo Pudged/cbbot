@@ -44,6 +44,7 @@ To run this project, you will need to add the following environment variables to
 `BOOKING_CODE`: Obtain from your unique email link \
 `PARTY_SIZE`: Size of party (1-8)\
 `SERVICE`: lunch or dinner\
+`SEATING`: 'default' for traditional dining or 'counter' for Cliffside Dining\
 `DISCORD_TOKEN`:  Token for Discord developer application\
 `GUILD`: Discord Server ID\
 `CHANNEL`: Discord Channel ID\
