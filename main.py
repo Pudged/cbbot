@@ -72,7 +72,7 @@ async def notify_discord(weekday, date, time):
         time (string): time on available day
     """
     guild = client.get_guild(GUILD)
-    # await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
+    await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
 
 
 async def check():
