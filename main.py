@@ -3,6 +3,9 @@ import dotenv
 import requests
 import datetime as dt
 import discord
+import time
+import asyncio
+import aiohttp
 
 from asyncio.tasks import current_task
 from discord import guild
@@ -60,7 +63,7 @@ async def notify_discord(weekday, date, time):
         time (string): time on available day
     """
     guild = client.get_guild(GUILD)
-    await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
+    # await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
 
 
 async def check():
@@ -71,6 +74,7 @@ async def check():
     }
 
     date = dt.date.today()
+    semaphore = asyncio.Semaphore(1)
 
     while True:
         print(f"Checking availability for {date.strftime('%A')} {date}")
@@ -79,40 +83,43 @@ async def check():
         # print(url)
 
         flag = False
+        await semaphore.acquire()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                try:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data['times_by_table_type']['default']:
+                            if RES_DATE not in dates:
+                                dates[RES_DATE] = []
+                            for _time in data['times_by_table_type']['default']:
+                                f_time = _time['time_display']
+                                if f_time in dates[RES_DATE]:
+                                    print(f"Reservation on {RES_DATE} at {f_time} already exists in local data")
+                                    continue
+                                else:
+                                    dates[RES_DATE].append(f_time)
+                                    print(f"Added {f_time} to {RES_DATE}")
+                                    await notify_discord(date.strftime('%A'), RES_DATE, f_time)
+                                # print(dates)
 
-        try:
-            response = requests.get(url, headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                if data['times_by_table_type']['default']:
-                    if RES_DATE not in dates:
-                        dates[RES_DATE] = []
-                    for time in data['times_by_table_type']['default']:
-                        f_time = time['time_display']
-                        if f_time in dates[RES_DATE]:
-                            print(f"Reservation on {RES_DATE} at {f_time} already exists in local data")
-                            continue
-                        else:
-                            dates[RES_DATE].append(f_time)
-                            print(f"Added {f_time} to {RES_DATE}")
-                            await notify_discord(date.strftime('%A'), RES_DATE, f_time)
-                        # print(dates)
+                    else:
+                        print("Error:", response.status)
+                        if response.status == 429:
+                            print(f"Sleeping for {rate_limit_sleep} second(s) while rate limited")
+                            await asyncio.sleep(rate_limit_sleep)
+                            flag = True
+                            semaphore.release()
+                        elif response.status == 400:
+                            print(f"{RES_DATE} does not exist in the calendar of dates yet")
+                            break
 
-            else:
-                print("Error:", response.status_code)
-                print(response.text)
-                if response.status_code == 429:
-                    print("Sleeping for a minute while rate limited")
-                    time.sleep(rate_limit_sleep)
-                    flag = True
-                elif response.status_code == 400:
-                    break
-
-        except requests.exceptions.RequestException as e:
-            print("Error:", e)
+                except requests.exceptions.RequestException as e:
+                    print("Error:", e)
 
         if not flag:
             date += dt.timedelta(days=1)
+            semaphore.release()
 
         # if date == end_date:
         #     break
