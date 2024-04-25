@@ -38,6 +38,10 @@ dates={}
 sleep_time = 10 # minutes
 rate_limit_sleep = 60 # seconds
 
+# Counters to reset local data struct to have a clean slate of times stored every day
+count = 0
+day_count = 60 / sleep_time * 24
+
 @client.event
 async def on_ready():
     """ Run on initialization of connection to Discord client
@@ -53,6 +57,12 @@ async def slow_count():
         await check()
         print(f"Sleeping for {sleep_time} minutes")
 
+    global count
+    if count >= day_count:
+        clear_data()
+        count = 0
+    count += 1
+
 async def notify_discord(weekday, date, time):
     """Send notification to CHANNEL while pinging USER_ID
 
@@ -62,7 +72,7 @@ async def notify_discord(weekday, date, time):
         time (string): time on available day
     """
     guild = client.get_guild(GUILD)
-    await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
+    # await guild.get_channel(CHANNEL).send(f"<@{USER_ID}> A new date was added for party size {PARTY_SIZE} for {SERVICE} on {weekday} {date} at {time}")
 
 
 async def check():
@@ -122,6 +132,13 @@ async def check():
 
         # if date == end_date:
         #     break
+
+def clear_data():
+    """_clears local data structure with times available
+    """
+    print("Clearing local data structure")
+    global dates
+    dates={}
 
 if __name__ == '__main__':
     """Main
